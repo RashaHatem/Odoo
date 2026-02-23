@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List_view -->
+    <record id="student_list_view" model="ir.ui.view">
+        <field name="name">student.list.view</field>
+        <field name="model">school.student</field>
+        <field name="arch" type="xml">
+            
+                
+            
+            <list
+                decoration-danger="state =='suspended'" default_group_by="school_id" expand="1" >
+                <!-- default_group_by="school_id" expand="1" -->
+                <!-- groups_limit="2" -->
+                <header>
+                    <button name="reload_page" type="object" string="reload" class="btn-primary" display="always"/>
+                </header>
+                <groupby name="school_id">
+        <button 
+            type="object" 
+            name="print_school_name" 
+            icon="fa-users" 
+            title="print school name"
+            />
+            
+        <field name="email"/>
+        
+        <button 
+            type="object" 
+            name="action_done" 
+            string="Send Reminder" 
+            invisible="email == False"/>
+    </groupby>
+                <field name="name" width="140px"
+                    decoration-bf="1"
+                />
+                
+                
+                
+                <field name="school_id" />
+                
+
+                <button name="%(action_hobbies)d"
+                    string="action type"
+                    type="action"
+                    icon="fa-check"
+                    invisible="state_ != 'draft'"
+                    class="btn-scondary" />
+
+                
+
+                <field name="state" widget="badge"
+                    decoration-success="state == 'active'"
+                />
+                <field name="absence_count" widget="progressbar" sum="Total" />
+                <button name="action_done"
+                    string="refresh"
+                    type="object"
+                    icon="fa-refresh"
+                    invisible="state_ != 'draft'"
+                    class="btn-primary"
+                    title="Che"
+                    confirm="Are you sure?"
+                    column_invisible="context.get('hide_confirm')"
+                />
+                <button name="unlink"
+                    type="object"
+                    icon="fa-trash"
+                    
+
+                />
+            </list>
+        </field>
+    </record>
+    <record id="hobby_list_view" model="ir.ui.view">
+        <field name="name">hobby.list.view</field>
+        <field name="model">hobbies</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+            </list>
+        </field>
+    </record>
+
+    <record id="school_extend_form" model="ir.ui.view">
+        <field name="name">School extend form</field>
+        <field name="model">school.profile</field>
+        <field name="inherit_id" ref="school.school_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name= 'details'] " position="after">
+                <page string="Student List" name="ds">
+                    <field name="student_count_"
+                        invisible="student_count_ == 0"
+                    />
+                    <field name="school_list">
+                        <list>
+                            <field name="name" decoration-info="parent.is_virtual_class == True" />
+                        </list>
+                        <form>
+                            <group>
+                                <field name="name" />
+                            </group>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//button[@name='action_view_related_records']" position="inside">
+                <span>
+                    <field name="student_count_"
+                        invisible="student_count_ == 0 "
+                    /> Student </span>
+            </xpath>
+        </field>
+    </record>
+    <!-- Form -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="المدرسة" string="إعدادات المدرسة" name="school">
+                    <block title="إعدادات الطلاب">
+                        <setting type="hedar" string="الغياب">
+                            <field name="max_absence_days" />
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+    <record id="student_form_view" model="ir.ui.view">
+        <field name="name">student.form.view</field>
+        <field name="model">school.student</field>
+        <field name="arch" type="xml">
+            <form>
+                <header class="my_custom_header">
+                    <button name="action_submit"
+                        string="تقديم الطلب"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state_ != 'draft'" />
+                    <button name="action_accept"
+                        string="قبول"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state_ != 'submitted'" />
+                    <button name="action_reject"
+                        string="رفض"
+                        type="object"
+                        invisible="state_ != 'submitted'" />
+                    <button name="action_draft"
+                        string="إعادة للمسودة"
+                        type="object"
+                        invisible="state_ != 'rejected'" />
+                    <field name="state_"
+                        widget="statusbar"
+                        statusbar_visible="draft,submitted,accepted" />
+                    <button name="action_done" string="Save"
+                        type="object"
+                        class="oe_highlight" />
+                </header>
+                <sheet>
+                
+                    <div class="alert alert-warning text-center o_form_header"
+                        role="status"
+                        invisible="state_ != 'draft'">
+                        <i class="fa fa-info-circle me-1" />
+                        <strong>ملاحظة:</strong> هذا السجل لا
+                        يزال مسودة، يمكنك تعديله بحرية. </div>
+                    <widget name="web_ribbon" title="مقبول" bg_color="bg-success"
+                        invisible="state_ != 'accepted'" />
+                    <widget name="web_ribbon" title="مرفوض" bg_color="bg-danger"
+                        invisible="state_ != 'rejected'" />
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="school_id" />
+                            <field name="hobby_list"
+                                widget="many2many_checkboxes"
+                            />
+                            <field name="absence_count" />
+                            <field name="state" />
+                            <field name="priority" widget="priority" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="hobby_form_view" model="ir.ui.view">
+        <field name="name">hobby.form.view</field>
+        <field name="model">hobbies</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="name" />
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+    <record id="action_school_student" model="ir.actions.act_window">
+        <field name="name">School Student</field>
+        <field name="res_model">school.student</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'hide_confirm': False}</field>
+    </record>
+
+    <record id="action_hobbies" model="ir.actions.act_window">
+        <field name="name">Hobbies</field>
+        <field name="res_model">hobbies</field>
+        <field name="view_mode">list,form</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="student_root_menu"
+        name="Student Management" />
+
+
+    <menuitem id="school_student_menu"
+        name="Students"
+        parent="student_root_menu"
+        action="action_school_student"
+         />
+
+    <menuitem id="student_sub_menu"
+        name="Hobbies"
+        parent="student_root_menu"
+        action="action_hobbies"
+         />
+    <!-- <menuitem id="student_root_menu" name="Student Management" action="action_school_student"
+    />
+
+<menuitem id="student_sub_menu" name="Hobbies" parent="student_root_menu" action="action_hobbies"/> -->
+    <!-- <menuitem id="school_student_menu" name="School Students" action="action_school_student"
+    parent="student_sub_menu" /> -->
+</odoo>
