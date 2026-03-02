@@ -7,7 +7,8 @@ class SchoolStudent(models.Model):
     
     name =  fields.Char(string='Student Name')
     school_id = fields.Many2one('school.profile', string= 'School Name')
-    
+    image_128 = fields.Image(string="Student Image", max_width=128, max_height=128)
+    color = fields.Integer(string="Color" , compute="_compute_color")
     hobby_list = fields.Many2many(
         string='Hobby',
         comodel_name='hobbies',
@@ -20,7 +21,7 @@ class SchoolStudent(models.Model):
         ('active', 'مستمر'),
         ('suspended', 'موقوف')
     ], string="الحالة", compute="check_absence_limit", store=True, readonly=True)
-    
+    active = fields.Boolean(string="Active", default=True)
     priority = fields.Selection([
     ('0', 'Low'),
     ('1', 'Normal'),
@@ -32,7 +33,18 @@ class SchoolStudent(models.Model):
         ('accepted', 'مقبول'),
         ('rejected', 'مرفوض'),
     ], string="الحالة", default='draft', tracking=True)
-
+    
+    @api.onchange('state_')
+    def _compute_color(self):
+        for record in self:
+            if record.state_ == 'accepted':
+                record.color = 10
+            elif record.state_ == 'rejected':
+                record.color = 1
+            elif record.state_ == 'draft':
+                record.color= 3
+            
+    
     @api.onchange('absence_count')
     def _onchange_absence_count(self):
         if self.absence_count<3:
@@ -175,3 +187,44 @@ class Hobby (models.Model):
     _name ="hobbies"
     
     name = fields.Char("Hobby")
+
+
+class SchoolMeeting(models.Model):
+    _name = 'school.meeting'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _description = 'اجتماعات المدرسة'
+    _order = 'start_date desc'
+
+    name = fields.Char(string='عنوان الاجتماع', required=True)
+    
+    # حقول التوقيت (أساسية للتقويم)
+    start_date = fields.Datetime(string='وقت البداية', required=True, default=fields.Datetime.now)
+    end_date = fields.Datetime(string='وقت النهاية', required=True)
+    
+    # حقل لتحديد نوع الاجتماع (للتلوين)
+    meeting_type = fields.Selection([
+        ('teachers', 'اجتماع معلمين'),
+        ('parents', 'اجتماع أولياء أمور'),
+        ('admin', 'اجتماع إداري')
+    ], string='نوع الاجتماع', default='teachers')
+    
+    # حقل المسؤول (للفلترة الجانبية)
+    user_id = fields.Many2one('res.users', string='المسؤول عن الاجتماع', default=lambda self: self.env.user)
+    
+    # حقل لوصف الاجتماع
+    description = fields.Html(string='جدول الأعمال')
+    
+    # حقل منطقي للاجتماعات التي تستمر طوال اليوم
+    is_all_day = fields.Boolean(string='طوال اليوم', default=False)
+    
+    
+class AcademyCoach(models.Model):
+    _name = 'academy.coach'
+    
+    name = fields.Char(string="اسم المدرب")
+    image_128 = fields.Image(string="الصورة", max_width=128, max_height=128)
+
+class AcademyCourse(models.Model):
+    _name = 'academy.course'
+
+    coach_id = fields.Many2one('academy.coach', string="المدرب")

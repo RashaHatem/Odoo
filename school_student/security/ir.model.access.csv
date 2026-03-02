@@ -1,3 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 student_access_id,Student_Admin,model_school_student,base.group_user,1,1,1,1
 access_hobbies,hobbies,model_hobbies,base.group_user,1,1,1,1
+access_meetings,meetings,model_school_meeting,base.group_user,1,1,1,1
+access_academy_coach,academy_coach,model_academy_coach,base.group_user,1,1,1,1
+access_academy_course,academy_course,model_academy_course,base.group_user,1,1,1,1

@@ -29,6 +29,10 @@ Long description of module's purpose
         
     ],
     'assets': {
+    'web._assets_primary_variables': [
+    
+        ('prepend','school_student/static/src/scss/style.scss')
+    ],
     'web.assets_backend': [
         'school_student/static/src/css/style.css',
     ],

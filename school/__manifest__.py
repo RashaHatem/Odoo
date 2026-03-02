@@ -11,6 +11,11 @@
         "security/ir.model.access.csv",
         "views/school_view.xml",
         
-    ]
+    ],
+    'assets': {
+    'web.assets_backend': [
+        
+    ],
+},
     
 }

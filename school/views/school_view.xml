@@ -71,7 +71,7 @@
                         <group>
                             <field name="currency_id" />
                             <field name="fees"/>
-                            <field name="active" widget="boolean_toggle"/>
+                            <field name="active" widget="boolean_button" options="{'terminology': 'active'}"/>
                             <field name="date"/>
                             <field name="school_type"/>
                             <field name="message" widget="html" options="{'collaborative': True, 'resizable': True}"/>
@@ -95,11 +95,17 @@
             </form>
         </field>
     </record>
+
+  
+
     <record id="action_school_profile" model="ir.actions.act_window">
         <field name="name">School Profile</field>
         <field name="res_model">school.profile</field>
         <field name="view_mode">list,form</field>
     </record>
+
+    
+
     <menuitem id="school_root_menu" name="School Management" />
     <menuitem id="school_sub_menu" name="Configuration" parent="school_root_menu"/>
     <menuitem id="school_profile_menu" name="School Profiles" action="action_school_profile" parent="school_sub_menu" />
