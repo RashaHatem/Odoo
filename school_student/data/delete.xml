@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- <record id="base.group_allow_export" model="res.groups">
+            <field name="name">Disabled Export Group</field>
+            <field name="users" eval="[(5, 0, 0)]"/> 
+        </record> -->
+
+    <!-- <record id="base.group_allow_export" model="res.groups">
+    <field name="name">Allow export</field> 
+    <field name="users" eval="[(4, ref('base.user_admin'))]"/> 
+    </record> -->
+
+    </data>
+</odoo>

@@ -4,11 +4,17 @@ from odoo.exceptions import ValidationError, UserError
 # from lxml import etree
 class SchoolStudent(models.Model):
     _name = "school.student"
+    _description = "school student"
+    _inherit = ['avatar.mixin']
     
     name =  fields.Char(string='Student Name')
+    email = fields.Char(string="البريد الإلكتروني", required=True)
     school_id = fields.Many2one('school.profile', string= 'School Name')
-    image_128 = fields.Image(string="Student Image", max_width=128, max_height=128)
     color = fields.Integer(string="Color" , compute="_compute_color")
+    total_fees = fields.Float(
+    string='Fees'
+    )
+    user_id = fields.Many2one('res.users', string='حساب المستخدم', ondelete='cascade')
     hobby_list = fields.Many2many(
         string='Hobby',
         comodel_name='hobbies',
@@ -16,6 +22,7 @@ class SchoolStudent(models.Model):
         column1='student_id',
         column2='hobby_id',
     )
+    code_content =fields.Text(string="code")
     absence_count = fields.Integer("عدد أيام الغياب")
     state = fields.Selection([
         ('active', 'مستمر'),
@@ -43,23 +50,26 @@ class SchoolStudent(models.Model):
                 record.color = 1
             elif record.state_ == 'draft':
                 record.color= 3
+            else:
+                record.color=0
             
     
-    @api.onchange('absence_count')
-    def _onchange_absence_count(self):
-        if self.absence_count<3:
-            return{
-                'warning':{
-                    'title':'Wait',
-                    'message':'You can not edit it',
-                    'type':'notification'
-                }
-            }
-    @api.constrains('absence_count')
-    def _check_day(self):
-        for rec in self:
-            if rec.absence_count>3:
-                raise UserError ('You cant enter grater than 3')
+    # @api.onchange('absence_count')
+    # def _onchange_absence_count(self):
+    #     if self.absence_count<3:
+    #         return{
+    #             'warning':{
+    #                 'title':'Wait',
+    #                 'message':'You can not edit it',
+    #                 'type':'notification'
+    #             }
+    #         }
+    # @api.constrains('absence_count')
+    # def _check_day(self):
+    #     for rec in self:
+    #         if rec.absence_count>3:
+    #             # raise UserError ('You cant enter grater than 3')
+    #             print('ok')
             
     def action_done(self):
    
@@ -69,15 +79,38 @@ class SchoolStudent(models.Model):
             'params': {
                 'title': 'نجاح',
                 'message': 'تم تحديث البيانات بنجاح',
-                'sticky': False, 
+                'sticky': True, 
                 'type': 'success',
+                
+          
                 'next':{
                     'type':'ir.actions.client',
                     'tag':'soft_reload'
                 } 
             }
     }
-
+        # return {
+        #     'effect':{
+        #         'type':'rainbow_man',
+        #         'message':'well Done my student , all the best',
+        #         'fadeout':'medium',
+        #         'img_url': '/school_student/static/img/smile.svg'
+        #     }
+        # }
+    
+    def open_wizard(self):
+        return{
+            'type':'ir.actions.act_window',
+            'name':'Update Fees for Student',
+            'res_model':'student.fees.update.wizard',
+            'view_mode':'form',
+            'context':{
+                'default_name':self.name
+            },
+            'target':'new'
+            
+        }
+    
     def reload_page(self):
         return {
             'type':'ir.actions.client',
@@ -85,23 +118,28 @@ class SchoolStudent(models.Model):
         }
    
     def action_submit(self):
-        for rec in self:
-            rec.state_ = 'submitted'
+        self.write({'state_': 'submitted'})
 
     
     def action_accept(self):
-        for rec in self:
-            rec.state_ = 'accepted'
+         self.write({'state_': 'accepted'})
+         if not self.user_id:
+                user = self.env['res.users'].create({
+                    'name': self.name,
+                    'login': f"{self.name}_{self.id}",      
+                    'email': self.email,     
+                    'groups_id': [(6, 0, [self.env.ref('base.group_user').id])] 
+                })
+                self.user_id = user.id
 
     
     def action_reject(self):
-        for rec in self:
-            rec.state_ = 'rejected'
+        self.write({'state_':'rejected'})
             
    
     def action_draft(self):
-        for rec in self:
-            rec.state_ = 'draft'
+        self.write({'state_':'draft'})
+        
     def unlink(self):
         return super().unlink()
     
@@ -120,11 +158,19 @@ class SchoolStudent(models.Model):
             else:
                 record.state = 'active'
     
+    def action_open_website_self(self):
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': 'https://www.odoo.com',
+            'target': 'new',
+        }
     
-    @api.model
-    def create(self,val):
-        rtn= super(SchoolStudent,self).create(val)
+    @api.model_create_multi
+    def create(self,val_list):
+        rtn= super(SchoolStudent,self).create(val_list)
         return rtn
+    
     def costom_method(self):
         self.ensure_one()
         print(self.name)
@@ -187,6 +233,9 @@ class Hobby (models.Model):
     _name ="hobbies"
     
     name = fields.Char("Hobby")
+    color = fields.Integer(string='color', 
+    default='2'
+    )
 
 
 class SchoolMeeting(models.Model):

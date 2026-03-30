@@ -1,8 +1,11 @@
 from odoo import fields, models
 from odoo import api
 from lxml import etree
+
+
 class SchollProfile(models.Model):
     _name = "school.profile"
+    _description = "school profile"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
     name = fields.Char(string = "Name", tracking=True)

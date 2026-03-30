@@ -1,5 +1,9 @@
 .my_custom_header {
-    background-color: #ceb1ef !important; /* لون كحلي */
+    background-color: #d5ebd5 !important; 
     color: white !important;
-    border-bottom: 2px solid #e7d7b9 !important; /* خط سفلي ذهبي */
+    border-bottom: 2px solid #ffffff !important; 
+}
+.custom_me {
+    background-color: #db200b !important;
+    color: #ffffff !important;
 }

@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-   
+   <record id="action_hobbies" model="ir.actions.act_window">
+        <field name="name">Hobbies</field>
+        <field name="res_model">hobbies</field>
+        <field name="view_mode">list,form</field>
+        <field name="target">current</field>
+    </record>
     <!-- List_view -->
     <record id="student_list_view" model="ir.ui.view">
         <field name="name">student.list.view</field>
         <field name="model">school.student</field>
         <field name="arch" type="xml">
-            <list>
+            <list export_xlsx="0" import="0" >
                 <!-- decoration-danger="state =='suspended'" default_group_by="school_id" expand="1" > -->
                 <!-- default_group_by="school_id" expand="1" -->
                 <!-- groups_limit="2" -->
                 <header>
-                    <button name="reload_page" type="object" string="reload" class="btn-primary" display="always"/>
+                    <button name="action_open_website_self" 
+                            type="object" 
+                            string="URL"  
+                            class="btn-primary"
+                            display="always"
+                           
+                             
+                        />
                 </header>
                 <groupby name="school_id" >
                     <button 
@@ -30,8 +42,8 @@
                         options="{'avatar_field': 'image_128'}"
                         decoration-bf="1"/>
                 
-                <field name="school_id"/>
-                <button name="%(action_hobbies)d"
+                <field name="school_id" class="custom_me"/>
+                <button name="%(school_student.action_hobbies)d"
                     string="action type"
                     type="action"
                     icon="fa-check"
@@ -41,10 +53,13 @@
                     decoration-success="state == 'active'"
                 />
                 <field name="absence_count" 
-                       widget="progressbar" 
+                       widget="percentpie" 
+                       class="my_red_pie"
+                       
 
                        
                        />
+                       
                        <!-- options="{'current_value': 'absence_count', 'max_value': 100, 'editable': true}" -->
                 <button name="action_done"
                     string="refresh"
@@ -56,11 +71,21 @@
                     confirm="Are you sure?"
                     column_invisible="context.get('hide_confirm')"
                 />
-                <button name="unlink"
+                <!-- <button name="unlink"
                     type="object"
                     icon="fa-trash"
-                />
+                /> -->
+                <!-- <field name="hobby_list" 
+                widget="many2many_tags"
+                /> -->
                 <field name="active" widget="boolean_toggle"/>
+                 <button name="%(school_student.update_student_fees_action)d" 
+                            type="action" 
+                            string="Update Fees"  
+                            class="btn-primary"
+                           
+                             
+                        />
             </list>
         </field>
     </record>
@@ -143,6 +168,19 @@
 
    </record>
    
+   <record id="meetings_tree" model="ir.ui.view">
+    <field name="name">meetings.tree</field>
+    <field name="model">school.meeting</field>
+    <field name="arch" type="xml">
+        <list string="School Meetings">
+            <field name="name"/>
+            <field name="activity_ids" widget="list_activity"/>
+            <field name="message_ids" widget="many2many_tags"/>
+        </list>
+    </field>
+   </record>
+
+
     <record id="hobby_list_view" model="ir.ui.view">
         <field name="name">hobby.list.view</field>
         <field name="model">hobbies</field>
@@ -232,9 +270,11 @@
                     <field name="state_"
                         widget="statusbar"
                         statusbar_visible="draft,submitted,accepted" />
-                    <!-- <button name="action_done" string="Save"
-                        type="object"
-                        class="oe_highlight" /> -->
+                    <button name="open_wizard" 
+                            string="Custom Fees"
+                            type="object"
+                            class="btn-primary"
+                            data-hotkey="d" />
                 </header>
                 <sheet>
                     <div class="alert alert-warning text-center o_form_header"
@@ -251,33 +291,43 @@
                     <group>
                         <group>
                             <field name="name" />
+                            <field name="total_fees"/>
                             <!-- <field name="image" 
                             widget="image" class="oe_avatar rounded-circle" 
                             options="{'preview_image': 'image', 'size': [90, 90]}"
                             /> -->
-                            <label for="image_128" string="Profile Photo"/>
+                            <label for="image_1920" string="Profile Photo"/>
                             <div class="d-flex align-items-center">
-                                <field name="image_128" 
+                                <field name="image_1920" 
                                     widget="image" 
                                     class="oe_avatar" 
                                     style="object-fit: cover !important; width: 90px; height: 90px; overflow: hidden;"
                                     options="{'size': [90, 90],'zoom':true}"/>
                             </div>
                             <field name="school_id" widget="selection" />
+                            <field name="color" widget="color_selection"/>
+                        </group>
+                        <group>      
                             <field name="active" widget="boolean_toggle"/>
                             <field name="hobby_list" 
-                                widget="many2many_checkboxes"
+                                widget="many2many_tags"
+                                options="{'no_create': True, 'color_field': 'color'}"
                                 
                                 
                             />
 
                             <field name="absence_count"
                             />
+                            <field name="email"/>
                             <field name="state" />
                             <field name="priority" widget="priority"/>
+                            <field name="code_content" 
+                                   widget="ace" 
+                                   options="{'mode': 'python', 'theme': 'monokai','tabsize':4}" />
                         </group>
                     </group>
                 </sheet>
+                
             </form>
         </field>
     </record>
@@ -371,12 +421,7 @@
         <field name="view_mode">list,form,kanban,pivot,graph</field>
         <field name="context">{'hide_confirm': False, 'search_default_active':1}</field>
     </record>
-    <record id="action_hobbies" model="ir.actions.act_window">
-        <field name="name">Hobbies</field>
-        <field name="res_model">hobbies</field>
-        <field name="view_mode">list,form</field>
-        <field name="target">current</field>
-    </record>
+    
     <record id="action_search_student" model="ir.actions.act_window">
         <field name="name">Action Search Student</field>
         <field name="res_model">school.student</field>
@@ -394,6 +439,16 @@
         <field name="name">Action Course</field>
         <field name="res_model">academy.course</field>
         <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+        <p class="o_view_nocontent_empty_folder">
+            قم بإنشاء أول سجل لمدرستك!
+        </p>
+        <p>
+            هنا يمكنك إدارة جميع بيانات المدارس، الفصول، والطلاب بكل سهولة.
+        </p>
+        <a href="https://your-docs-link.com" target="_blank" class="btn btn-secondary">click</a>
+        
+    </field>
     </record>
 
     <!-- <record id="action_kanban_student" model="ir.actions.act_window">
@@ -459,6 +514,7 @@
                         string="ظاهر دائماً" 
                         display="always"
                         class="btn btn-primary"
+                        data-hotkey="y"
                     />
                 </header>
                     <t t-name="card">
@@ -466,8 +522,8 @@
                         <div t-attf-class="oe_kanban_global_click d-flex flex-row">
                        <aside>
                             <div class="o_kanban_image me-3 mt-2">
-                                <img t-attf-src="/web/image/school.student/#{record.id.raw_value}/image_128"
-                                     class="rounded-circle border border-2"
+                                <img t-attf-src="/web/image/school.student/#{record.id.raw_value}/avatar_128"
+                                     class="rounded-circle border border-2 oe_avatar"
                                      options="{'size':[100,100]}"/>
                             </div>
                        </aside>
@@ -552,12 +608,9 @@
                
                             <field name="coach_id" 
                             widget="many2one_avatar"
-                            />
-                            
-                            
-                       
-            </list>
-        </field>
+                            options="{'preview_image': 'image_128'}"/>
+                            </list>
+        </field>    
     </record>
 
     

@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        
+        {
+            "name": "Odoo 18",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "console": "integratedTerminal",
+            "program": "D:\\odoo\\odoo18\\odoo-bin",
+            "args": [
+                "--config=${workspaceFolder}\\.vscode\\odoo.conf",
+                // "-d", "Alibaba-DB-pro-main-test",
+                // "-u", "sccc_app_apis"
+                // "-u", "all --stop-after-init"
+
+            ]
+        }
+    ]
+}

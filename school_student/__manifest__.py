@@ -7,7 +7,7 @@
     'description': """
 Long description of module's purpose
     """,
-
+    'license': 'LGPL-3',
     'author': "My Company",
     'website': "https://www.yourcompany.com",
 
@@ -18,15 +18,17 @@ Long description of module's purpose
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','school'],
+    'depends': ['base','mail','school'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'data/hobbies.csv',
+        'wizard/update_fees_wizard.xml',
         'views/views.xml',
-        'views/templates.xml'
-        
+        'views/templates.xml',
+        'data/delete.xml',
+                
     ],
     'assets': {
     'web._assets_primary_variables': [
